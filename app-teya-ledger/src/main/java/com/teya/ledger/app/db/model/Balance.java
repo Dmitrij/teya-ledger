@@ -11,8 +11,10 @@ import lombok.Data;
 @Table(name = "tl_balance")
 public final class Balance {
 
+    public static final String GLOBAL_ACCOUNT_ID = "GLOBAL_ACCOUNT";
+
     @Id
-    private String accountId = "GLOBAL_ACCOUNT";
+    private String accountId = GLOBAL_ACCOUNT_ID;
 
     @Column(nullable = false)
     private long balance = 0L;

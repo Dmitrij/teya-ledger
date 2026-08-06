@@ -163,8 +163,20 @@ now you can see all your endpoints definitions under http://localhost:8080/swagg
 
 // 15 min spent  
 
+## Step #8 - Define "Service and Controller" layer
+
+Before jumping to most interesting part of transaction movement implementation, lets define REST controller and service layers
+
+* LedgerRestController added.
+* LedgerService added - here I prefer explicitly work with interfaces and actual impl classes. 
 
 
+* GET /api/v1/history added
+* GET /api/v1/balance added
+
+Results are checked in Swagger
+
+// 15 min spent  
 
 
 

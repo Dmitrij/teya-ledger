@@ -22,7 +22,7 @@ import static com.teya.ledger.lib.api.TeyaLedgerApi.VERSION_PATH;
 @RestController
 // "/api/v1"
 @RequestMapping(value = {API_PREFIX}, produces = MEDIA_TYPE_APPLICATION_JSON)
-public class InfoRestController {
+public final class InfoRestController {
 
     private final InfoService infoService;
 

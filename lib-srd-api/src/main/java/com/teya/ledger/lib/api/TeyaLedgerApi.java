@@ -8,6 +8,10 @@ public final class TeyaLedgerApi {
 
     public static final String VERSION_PATH = "/version";
 
+    public static final String HISTORY_PATH = "/history";
+
+    public static final String BALANCE_PATH = "/balance";
+
     private TeyaLedgerApi() {
         // Utility Class
     }
