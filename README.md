@@ -40,7 +40,7 @@ Project name, Git repo, README (where I'm also going to track time spent)
 * Database: H2 In-Memory
 * Containerization: Docker/Docker Compose
 
-// 10 min
+// 10 min spent
 
 ## Step #3a Architecture Design
 * Demonstrate CQRS & Event Sourcing (see Step #3b) - to satisfy "Current Balance storage" alignment with fintech industry standards
@@ -63,7 +63,7 @@ and creates severe database locking issues under high concurrent loads
 * Synchronization: When a new DEPOSIT or WITHDRAWAL command successfully validates and writes to the immutable transaction log, a localized event updater immediately recalculates and updates the cached current balance state
 * Production Scaling Scalability: In this tiny ledger, both models sit within the same H2 database runtime context. However, this architectural decoupling ensures that in a production ecosystem, the Write side can seamlessly scale using Apache Kafka, while the Read side can be offloaded to highly available replica instances or a Redis caching cluster.
 
-// 15 min
+// 15 min spent
 
 ## Step #4 - Prepare sandbox
 Here I'll skip logical next step of architectural design, like define endpoints and responses, module diagrams and so on.  
@@ -85,7 +85,20 @@ I would jump right into project initial setup/config (setup spring boot, depende
 
 In this step I satisfied one of the requirements: "Demonstrate application modularity".
 
-// 20 min
+// 20 min spent
+
+## Step #5 - Out of scope (extra) preparation step
+I would like to ensure that so far My app is able to compile, build and launch.
+During application development I prefer to reduce potential point of failures. 
+
+I want to be sure that Swagger works and we can guaranty on the fly rest call executions. 
+Beside of that, as a side effect, I will get a basic package (layers) structure.
+I would like quickly create an endpoint that shows "application version", let's spend extra 10 min for that
+
+now you can see all your endpoints definitions under http://localhost:8080/swagger-ui/index.html
+
+// 20 min spent - shows my original estimate versus actual
+
 
 
 
