@@ -229,5 +229,8 @@ curl.exe -X GET http://localhost:8080/api/v1/history
 docker compose down
 ```
 
+// 100 min spent (mainly consumed by debugging Dockerfile)
 
+// TOTAL ~ 5 hours spent during 2 days  
 
+Conclusion and Results will be discussed during interview...
