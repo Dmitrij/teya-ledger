@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  tiny-ledger:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: teya-tiny-ledger
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # Настройки для логирования в консоль Docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK=INFO
+    restart: unless-stopped

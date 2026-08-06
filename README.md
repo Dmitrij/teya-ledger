@@ -147,28 +147,31 @@ now you can see all your endpoints definitions under http://localhost:8080/swagg
     - lightweight append-only log for Event Sourcing
     - efficiency for DB
 
-// 20 min spent  
+// 20 min spent
 
 ## Step #7 - Define "Repository" layer
+
 2 repo needs to be created:
+
 * BalanceRepository
 * TransactionRepository
 
 #### Trade-off / Decisions
 
 * JpaRepository or CrudRepository - JpaRepository. As:
-  - cash control - methods .flush() and .saveAndFlush()
-  - generic Lists, instead Iterable
-  - minor - pagination support
+    - cash control - methods .flush () and .saveAndFlush ()
+    - generic Lists, instead Iterable
+    - minor - pagination support
 
-// 15 min spent  
+// 15 min spent
 
 ## Step #8 - Define "Service and Controller" layer
 
-Before jumping to most interesting part of transaction movement implementation, lets define REST controller and service layers
+Before jumping to most interesting part of transaction movement implementation, lets define REST controller and service
+layers
 
 * LedgerRestController added.
-* LedgerService added - here I prefer explicitly work with interfaces and actual impl classes. 
+* LedgerService added - here I prefer explicitly work with interfaces and actual impl classes.
 
 
 * GET /api/v1/history added
@@ -176,21 +179,55 @@ Before jumping to most interesting part of transaction movement implementation, 
 
 Results are checked in Swagger
 
-// 15 min spent  
+// 15 min spent
 
 ## Step #9 - Money Movement
-During this step I succeeded in primitive/simplified way to develop one of architectural patterns CQRS,
-securing "Ability to record money movements" requirement.
 
-// 25 min spent (including me playing with endpoints - i.e. testing)  
+During this step I succeeded in primitive/simplified way to develop one of architectural patterns CQRS, securing
+"Ability to record money movements" requirement.
+
+// 25 min spent (including me playing with endpoints - i.e. testing)
 
 ## Step #10 - Let's check all business requirements before wrapping an application
-// Skipping ... 
-// Here suppose to be checklist 
 
-## Step #11 - Chery on the pie - Docker
-coming soon... 
+// Skipping ... // Here suppose to be checklist
 
+## Step #11 - Chery on the pie - Docker & Launch
+
+From requirments: "We expect you to deliver a functional web application (no UI, just the apis)
+that can be run locally."
+
+Here we go:
+
+#### Run in docker build and deploy
+
+```bash
+docker compose up --build -d
+```
+
+#### Test and enjoy application
+
+* as option, I recomment to use "Swagger" http://localhost:8080/swagger-ui/index.html
+* Postman
+* or curl
+
+```bash
+curl.exe -X POST http://localhost:8080/api/v1/movement -H "Content-Type: application/json" -d "{\`"type\`": \`"DEPOSIT\`", \`"amount\`": 10000}"
+```
+
+```bash
+curl.exe -X GET http://localhost:8080/api/v1/balance
+```
+
+```bash
+curl.exe -X GET http://localhost:8080/api/v1/history
+```
+
+#### Shutdown containers
+
+```bash
+docker compose down
+```
 
 
 
