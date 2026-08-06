@@ -134,7 +134,7 @@ now you can see all your endpoints definitions under http://localhost:8080/swagg
 
 ## Step #6 - Define "Model" layer
 
-3 classes need to be created:
+3 classes needs to be created:
 
 * TransactionType - just to show transaction direction: DEPOSIT/WITHDRAWAL
 * Transaction - immutable event log to satisfy CQRS
@@ -148,6 +148,20 @@ now you can see all your endpoints definitions under http://localhost:8080/swagg
     - efficiency for DB
 
 // 20 min spent  
+
+## Step #7 - Define "Repository" layer
+2 repo needs to be created:
+* BalanceRepository
+* TransactionRepository
+
+#### Trade-off / Decisions
+
+* JpaRepository or CrudRepository - JpaRepository. As:
+  - cash control - methods .flush() and .saveAndFlush()
+  - generic Lists, instead Iterable
+  - minor - pagination support
+
+// 15 min spent  
 
 
 
