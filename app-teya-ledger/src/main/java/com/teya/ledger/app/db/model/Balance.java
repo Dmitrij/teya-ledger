@@ -19,4 +19,11 @@ public final class Balance {
     @Column(nullable = false)
     private long balance = 0L;
 
+    public void credit(long amount) {
+        this.balance += amount;
+    }
+
+    public void debit(long amount) {
+        this.balance -= amount;
+    }
 }

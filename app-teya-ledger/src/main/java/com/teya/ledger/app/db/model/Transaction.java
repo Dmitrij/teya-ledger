@@ -34,4 +34,14 @@ public final class Transaction {
     @Column(nullable = false, updatable = false)
     private LocalDateTime timestamp;
 
+    public Transaction() {
+    }
+
+    public Transaction(TransactionType type, long amount) {
+        this.type = type;
+        this.amount = amount;
+        this.timestamp = LocalDateTime.now();
+    }
+
+
 }

@@ -178,8 +178,18 @@ Results are checked in Swagger
 
 // 15 min spent  
 
+## Step #9 - Money Movement
+During this step I succeeded in primitive/simplified way to develop one of architectural patterns CQRS,
+securing "Ability to record money movements" requirement.
 
+// 25 min spent (including me playing with endpoints - i.e. testing)  
 
+## Step #10 - Let's check all business requirements before wrapping an application
+// Skipping ... 
+// Here suppose to be checklist 
+
+## Step #11 - Chery on the pie - Docker
+coming soon... 
 
 
 

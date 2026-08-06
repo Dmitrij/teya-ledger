@@ -12,6 +12,8 @@ public final class TeyaLedgerApi {
 
     public static final String BALANCE_PATH = "/balance";
 
+    public static final String MOVEMENT_PATH = "/movement";
+
     private TeyaLedgerApi() {
         // Utility Class
     }
