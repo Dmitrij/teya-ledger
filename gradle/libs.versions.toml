@@ -1,0 +1,24 @@
+[versions]
+springBoot = "4.0.7"
+springDependencyManagement = "1.1.7"
+
+googleGson = "2.13.1"
+
+jspecify = "1.0.0"
+jakartaValidationApi = "3.1.1"
+springDocOpenApi = "3.0.2"
+
+[libraries]
+
+google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "googleGson" }
+jspecify = { group = "org.jspecify", name = "jspecify", version.ref = "jspecify" }
+jakarta-validation-api = { group = "jakarta.validation", name = "jakarta.validation-api", version.ref = "jakartaValidationApi" }
+
+# i.e. swagger
+springdoc-openapi = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDocOpenApi" }
+
+[plugins]
+java-app = { id = "java" }
+java-library = { id = "java-library" }
+spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "springDependencyManagement" }

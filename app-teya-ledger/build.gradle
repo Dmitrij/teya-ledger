@@ -1,0 +1,46 @@
+plugins {
+    alias(libs.plugins.java.app)
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+}
+
+group = 'com.teya.ledger.app'
+version = '1.0.0'
+
+springBoot {
+    buildInfo {
+        properties {
+            artifact = 'app-teya-ledger'
+            name = 'Teya Ledger'
+        }
+    }
+}
+
+dependencies {
+
+    implementation project(':lib-srd-api')
+
+    implementation 'org.springframework.boot:spring-boot-h2console'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation libs.springdoc.openapi
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    runtimeOnly 'com.h2database:h2'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+java {
+    sourceCompatibility = tl_java_version
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

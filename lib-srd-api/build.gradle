@@ -1,0 +1,17 @@
+plugins {
+    alias(libs.plugins.java.library)
+}
+
+dependencies {
+
+    implementation libs.google.gson
+
+    implementation libs.jspecify
+    implementation libs.jakarta.validation.api
+
+}
+
+java {
+    sourceCompatibility = tl_java_version
+    targetCompatibility = tl_java_version
+}

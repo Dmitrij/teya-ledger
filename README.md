@@ -65,6 +65,29 @@ and creates severe database locking issues under high concurrent loads
 
 // 15 min
 
+## Step #4 - Prepare sandbox
+Here I'll skip logical next step of architectural design, like define endpoints and responses, module diagrams and so on.  
+
+Example
+```bash
+curl -X POST http://localhost:8080/api/v1/ledger/transactions \
+-H "Content-Type: application/json" \
+-d '{"type": "DEPOSIT", "amount": 250.50}'
+```
+or drawing diagrams
+```mermaid
+graph TD
+    app-teya-ledger --> lib-srd-api
+```
+I would jump right into project initial setup/config (setup spring boot, dependencies, etc.) 
+
+!!! keep in mind, Swagger OpenAPI will do all documentation job for us...
+
+In this step I satisfied one of the requirements: "Demonstrate application modularity".
+
+// 20 min
+
+
 
 
 
