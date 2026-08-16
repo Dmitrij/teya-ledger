@@ -11,8 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = TeyaLedgerApplication.class)
 @ActiveProfiles("test")
@@ -55,6 +56,35 @@ public class LedgerServiceTest {
         // Assert
         assertNotNull(secondTx);
         assertEquals(700L, ledgerService.getBalance(), "Баланс должен уменьшиться до 700");
+    }
+
+    @Test
+    void testGetTransactionHistory_ShouldReturnAllRecordedTransactions() {
+        long currentBalance = ledgerService.getBalance();
+        assertEquals(0L, currentBalance, "Initial balance should be equals 0");
+
+        // Arrange
+        ledgerService.recordMovement(depositDto);
+        ledgerService.recordMovement(withdrawDto);
+
+        // Act
+        List<Transaction> history = ledgerService.getTransactionHistory();
+
+        // Assert
+        assertNotNull(history);
+        assertEquals(2, history.size(), "История должна содержать ровно 2 транзакции");
+
+        // Дополнительные проверки структуры данных (зависит от полей вашего класса Transaction)
+        assertEquals(TransactionType.DEPOSIT, history.get(0).getType());
+        assertEquals(TransactionType.WITHDRAWAL, history.get(1).getType());
+    }
+
+    @Test
+    void testRecordMovement_ShouldThrowException_WhenDtoIsNull() {
+        // Assert
+        assertThrows(NullPointerException.class, () -> {
+            ledgerService.recordMovement(null);
+        }, "Метод должен выбросить NullPointerException, так как аргумент помечен @NonNull");
     }
 
 }
