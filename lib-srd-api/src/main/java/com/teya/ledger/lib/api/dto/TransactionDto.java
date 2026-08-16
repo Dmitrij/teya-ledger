@@ -14,11 +14,14 @@ public final class TransactionDto {
     @NotNull
     @Positive
     @SerializedName("amount")
-    public Long amount;
+    private Long amount;
 
-    @Override
-    public String toString() {
-        return String.format("TransactionDto{type=%s, amount=%s}", type, amount);
+    public TransactionDto() {
+    }
+
+    public TransactionDto(TransactionType type, Long amount) {
+        this.type = type;
+        this.amount = amount;
     }
 
     public TransactionType getType() {
@@ -35,6 +38,11 @@ public final class TransactionDto {
 
     public void setAmount(Long amount) {
         this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("TransactionDto{type=%s, amount=%s}", type, amount);
     }
 
 }

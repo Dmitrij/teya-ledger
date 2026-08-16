@@ -68,9 +68,9 @@ public class LedgerServiceImpl implements LedgerService {
 
         // 2. update projection
         if (TransactionType.DEPOSIT == t.getType()) {
-            balance.credit(t.amount);
+            balance.credit(t.getAmount());
         } else if (TransactionType.WITHDRAWAL == t.getType()) {
-            balance.debit(t.amount);
+            balance.debit(t.getAmount());
         } else {
             throw new IllegalStateException("Invalid transaction type");
         }
