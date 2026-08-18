@@ -34,6 +34,8 @@ public final class InfoRestController {
     @GetMapping(value = VERSION_PATH)
     public ApplicationVersionDto getServerVersion(@NonNull ServletRequest servletRequest) {
         log.info("getServerVersion from {}", servletRequest.getRemoteAddr());
+        ApplicationVersionDto retVal = infoService.getServerVersion();
+        log.info("getServerVersion: {}", ApplicationVersionDto.getAppNameAndVersion(retVal));
         return infoService.getServerVersion();
     }
 

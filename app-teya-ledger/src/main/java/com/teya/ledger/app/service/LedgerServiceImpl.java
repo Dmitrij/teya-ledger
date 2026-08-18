@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Slf4j
-@Service
 @RequiredArgsConstructor
+@Service
 public class LedgerServiceImpl implements LedgerService {
 
     private static final String GLOBAL_ACCOUNT_ID = Balance.GLOBAL_ACCOUNT_ID;
