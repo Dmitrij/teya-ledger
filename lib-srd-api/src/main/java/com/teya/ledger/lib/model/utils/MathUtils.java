@@ -19,4 +19,8 @@ public final class MathUtils {
         return SECURE_RANDOM.nextInt(minIncluding, maxIncluding + 1);
     }
 
+    public static boolean isBetween(long value, long min, long max) {
+        return value >= min && value <= max;
+    }
+
 }

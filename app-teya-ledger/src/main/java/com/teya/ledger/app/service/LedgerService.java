@@ -14,7 +14,7 @@ public interface LedgerService {
     List<Transaction> getTransactionHistory();
 
     /**
-     * QUERY SIDE: View current balance
+     * QUERY SIDE: View the current balance
      */
     long getBalance();
 

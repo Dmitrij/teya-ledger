@@ -2,6 +2,8 @@ package com.teya.ledger.app.service;
 
 import com.teya.ledger.app.TeyaLedgerApplication;
 import com.teya.ledger.app.db.model.Transaction;
+import com.teya.ledger.app.db.repository.BalanceRepository;
+import com.teya.ledger.app.db.repository.TransactionRepository;
 import com.teya.ledger.lib.api.dto.TransactionDto;
 import com.teya.ledger.lib.api.type.TransactionType;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,27 +14,46 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = TeyaLedgerApplication.class)
 @ActiveProfiles("test")
-@Transactional
 public class LedgerServiceTest {
 
     @Autowired
     private LedgerService ledgerService;
+
+    // Внедрите ваши репозитории, чтобы очищать БД между тестами
+    @Autowired
+    private BalanceRepository balanceRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     private TransactionDto depositDto;
     private TransactionDto withdrawDto;
 
     @BeforeEach
     void setUp() {
+        // Очищаем базу данных перед каждым тестом для полной изоляции
+        transactionRepository.deleteAll();
+        balanceRepository.deleteAll();
+
         depositDto = new TransactionDto(TransactionType.DEPOSIT, 1000L);
         withdrawDto = new TransactionDto(TransactionType.WITHDRAWAL, 300L);
     }
 
+    // Обычные тесты изолируем стандартной транзакцией Spring
     @Test
+    @Transactional
     void testGetBalance_ShouldReturnInitialBalance() {
         // Act
         long currentBalance = ledgerService.getBalance();
@@ -42,6 +63,7 @@ public class LedgerServiceTest {
     }
 
     @Test
+    @Transactional
     void testRecordMovement_ShouldUpdateBalanceAndSaveTransaction() {
         // Act: Начисление средств
         Transaction firstTx = ledgerService.recordMovement(depositDto);
@@ -59,6 +81,7 @@ public class LedgerServiceTest {
     }
 
     @Test
+    @Transactional
     void testGetTransactionHistory_ShouldReturnAllRecordedTransactions() {
         long currentBalance = ledgerService.getBalance();
         assertEquals(0L, currentBalance, "Initial balance should be equals 0");
@@ -80,11 +103,70 @@ public class LedgerServiceTest {
     }
 
     @Test
+    @Transactional
     void testRecordMovement_ShouldThrowException_WhenDtoIsNull() {
         // Assert
         assertThrows(NullPointerException.class, () -> {
             ledgerService.recordMovement(null);
         }, "Метод должен выбросить NullPointerException, так как аргумент помечен @NonNull");
     }
+
+    // Здесь @Transactional НЕЛЬЗЯ ставить, так как это многопоточный тест!
+    @Test
+    void testConcurrentMovement() throws InterruptedException {
+
+        long currentBalance = ledgerService.getBalance();
+        assertEquals(0L, currentBalance, "Initial balance should be equals 0");
+
+        ledgerService.recordMovement(depositDto);
+
+        List<TransactionDto> transactions = List.of(
+                this.depositDto,  // +1000
+                this.withdrawDto, // -300
+                this.withdrawDto, // -300
+                this.withdrawDto, // -300
+                this.withdrawDto, // -300
+                this.withdrawDto, // -300
+                this.withdrawDto, // -300
+                this.withdrawDto  // -300 (Этой транзакции не хватит денег, она упадет с ошибкой)
+        );
+
+        int numberOfThreads = transactions.size();
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads);
+
+        for (TransactionDto transactionDto : transactions) {
+            service.submit(() -> {
+                try {
+                    ledgerService.recordMovement(transactionDto);
+                } catch (Exception e) {
+                    // Логируем исключения, если потоки упадут из-за race condition или блокировок
+                    System.err.println("Thread execution failed: " + e.getMessage());
+                } finally {
+                    latch.countDown(); // Поток завершил работу
+                }
+            });
+            Thread.sleep(1);
+        }
+
+        // Ждем завершения всех потоков максимум 15 секунд
+        boolean finishedSuccessfully = latch.await(numberOfThreads * 3 + 2, TimeUnit.SECONDS);
+        service.shutdown();
+
+        // Assert
+        assertTrue(finishedSuccessfully, "Тест прерван по таймауту. Потоки заблокировали друг друга.");
+
+
+        currentBalance = ledgerService.getBalance();
+        assertEquals(200L, currentBalance, "Финальный баланс рассчитан неверно из-за Race Condition");
+
+        // Проверяем количество успешных транзакций в истории:
+        // 1 (стартовый депозит) + 1 (параллельный депозит) + 6 (успешных параллельных списаний) = 8
+        // 7-е списание откатилось и запись в историю НЕ попала.
+        int expectedHistorySize = 8;
+        assertEquals(expectedHistorySize, ledgerService.getTransactionHistory().size(), "Часть транзакций была потеряна");
+
+    }
+
 
 }
