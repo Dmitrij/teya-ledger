@@ -9,6 +9,11 @@ dependencies {
     implementation libs.jspecify
     implementation libs.jakarta.validation.api
 
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testCompileOnly libs.lombok
+    testAnnotationProcessor libs.lombok
+
 }
 
 java {

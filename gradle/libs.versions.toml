@@ -7,12 +7,14 @@ googleGson = "2.13.1"
 jspecify = "1.0.0"
 jakartaValidationApi = "3.1.1"
 springDocOpenApi = "3.0.2"
+lombok = "1.18.46"
 
 [libraries]
 
 google-gson = { group = "com.google.code.gson", name = "gson", version.ref = "googleGson" }
 jspecify = { group = "org.jspecify", name = "jspecify", version.ref = "jspecify" }
 jakarta-validation-api = { group = "jakarta.validation", name = "jakarta.validation-api", version.ref = "jakartaValidationApi" }
+lombok = { group = "org.projectlombok", name = "lombok", version.ref = "lombok" }
 
 # i.e. swagger
 springdoc-openapi = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springDocOpenApi" }

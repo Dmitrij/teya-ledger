@@ -3,9 +3,11 @@ package com.teya.ledger.lib.api.dto;
 import com.google.gson.annotations.SerializedName;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
 import java.util.Locale;
 
+@Data
 public final class ApplicationVersionDto {
 
     @NotNull

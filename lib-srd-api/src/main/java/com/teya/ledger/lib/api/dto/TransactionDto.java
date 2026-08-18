@@ -4,7 +4,9 @@ import com.google.gson.annotations.SerializedName;
 import com.teya.ledger.lib.api.type.TransactionType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Data;
 
+@Data
 public final class TransactionDto {
 
     @NotNull
@@ -21,22 +23,6 @@ public final class TransactionDto {
 
     public TransactionDto(TransactionType type, Long amount) {
         this.type = type;
-        this.amount = amount;
-    }
-
-    public TransactionType getType() {
-        return type;
-    }
-
-    public void setType(TransactionType type) {
-        this.type = type;
-    }
-
-    public Long getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Long amount) {
         this.amount = amount;
     }
 

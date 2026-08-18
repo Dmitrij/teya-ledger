@@ -4,6 +4,7 @@ import com.teya.ledger.app.TeyaLedgerApplication;
 import com.teya.ledger.app.db.model.Transaction;
 import com.teya.ledger.app.db.repository.BalanceRepository;
 import com.teya.ledger.app.db.repository.TransactionRepository;
+import com.teya.ledger.lib.api.dto.BalanceDto;
 import com.teya.ledger.lib.api.dto.TransactionDto;
 import com.teya.ledger.lib.api.type.TransactionType;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.teya.ledger.app.db.model.Balance.GLOBAL_ACCOUNT_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -56,7 +58,9 @@ public class LedgerServiceTest {
     @Transactional
     void testGetBalance_ShouldReturnInitialBalance() {
         // Act
-        long currentBalance = ledgerService.getBalance();
+        ledgerService.registerAccount(GLOBAL_ACCOUNT_ID);
+        BalanceDto dto = ledgerService.getBalance();
+        long currentBalance = asBalance(dto);
 
         // Assert
         assertEquals(0L, currentBalance, "Initial balance should be equals 0");
@@ -70,20 +74,22 @@ public class LedgerServiceTest {
 
         // Assert
         assertNotNull(firstTx);
-        assertEquals(1000L, ledgerService.getBalance(), "Баланс должен увеличиться на 1000");
+        assertEquals(1000L, asBalance(ledgerService.getBalance()), "Баланс должен увеличиться на 1000");
 
         // Act: Списание средств
         Transaction secondTx = ledgerService.recordMovement(withdrawDto);
 
         // Assert
         assertNotNull(secondTx);
-        assertEquals(700L, ledgerService.getBalance(), "Баланс должен уменьшиться до 700");
+        assertEquals(700L, asBalance(ledgerService.getBalance()), "Баланс должен уменьшиться до 700");
     }
 
     @Test
     @Transactional
     void testGetTransactionHistory_ShouldReturnAllRecordedTransactions() {
-        long currentBalance = ledgerService.getBalance();
+        ledgerService.registerAccount(GLOBAL_ACCOUNT_ID);
+
+        long currentBalance = asBalance(ledgerService.getBalance());
         assertEquals(0L, currentBalance, "Initial balance should be equals 0");
 
         // Arrange
@@ -115,7 +121,9 @@ public class LedgerServiceTest {
     @Test
     void testConcurrentMovement() throws InterruptedException {
 
-        long currentBalance = ledgerService.getBalance();
+        ledgerService.registerAccount(GLOBAL_ACCOUNT_ID);
+
+        long currentBalance = asBalance(ledgerService.getBalance());
         assertEquals(0L, currentBalance, "Initial balance should be equals 0");
 
         ledgerService.recordMovement(depositDto);
@@ -156,8 +164,7 @@ public class LedgerServiceTest {
         // Assert
         assertTrue(finishedSuccessfully, "Тест прерван по таймауту. Потоки заблокировали друг друга.");
 
-
-        currentBalance = ledgerService.getBalance();
+        currentBalance = asBalance(ledgerService.getBalance());
         assertEquals(200L, currentBalance, "Финальный баланс рассчитан неверно из-за Race Condition");
 
         // Проверяем количество успешных транзакций в истории:
@@ -168,5 +175,8 @@ public class LedgerServiceTest {
 
     }
 
+    private long asBalance(BalanceDto balanceDto) {
+        return balanceDto == null ? -1L : balanceDto.getBalance();
+    }
 
 }

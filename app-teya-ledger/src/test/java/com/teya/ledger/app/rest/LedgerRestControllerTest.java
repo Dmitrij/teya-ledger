@@ -2,6 +2,7 @@ package com.teya.ledger.app.rest;
 
 import com.teya.ledger.app.db.model.Transaction;
 import com.teya.ledger.app.service.LedgerService;
+import com.teya.ledger.lib.api.dto.BalanceDto;
 import com.teya.ledger.lib.api.type.TransactionType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,7 +33,7 @@ public class LedgerRestControllerTest {
     @Test
     void testGetBalance_ShouldReturnBalanceMap() throws Exception {
         // Arrange
-        Mockito.when(ledgerService.getBalance()).thenReturn(5000L);
+        Mockito.when(ledgerService.getBalance()).thenReturn(new BalanceDto("XXX", 5000L));
 
         // Act & Assert
         mockMvc.perform(get(API_PREFIX + BALANCE_PATH)

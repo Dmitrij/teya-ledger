@@ -2,6 +2,7 @@ package com.teya.ledger.app.rest;
 
 import com.teya.ledger.app.db.model.Transaction;
 import com.teya.ledger.app.service.LedgerService;
+import com.teya.ledger.lib.api.dto.BalanceDto;
 import com.teya.ledger.lib.api.dto.TransactionDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,9 +38,10 @@ public final class LedgerRestController {
     }
 
     @GetMapping(BALANCE_PATH)
-    public ResponseEntity<Map<String, Long>> getBalance() {
-        long currentBalance = ledgerService.getBalance();
-        return ResponseEntity.ok(Map.of("balance", currentBalance));
+    public BalanceDto getBalance() {
+        BalanceDto currentBalance = ledgerService.getBalance();
+        log.info("Current balance: {}", currentBalance);
+        return currentBalance;
     }
 
     @PostMapping(MOVEMENT_PATH)

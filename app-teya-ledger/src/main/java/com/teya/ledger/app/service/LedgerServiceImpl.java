@@ -4,6 +4,8 @@ import com.teya.ledger.app.db.model.Balance;
 import com.teya.ledger.app.db.model.Transaction;
 import com.teya.ledger.app.db.repository.BalanceRepository;
 import com.teya.ledger.app.db.repository.TransactionRepository;
+import com.teya.ledger.app.utils.LedgerDtoUtils;
+import com.teya.ledger.lib.api.dto.BalanceDto;
 import com.teya.ledger.lib.api.dto.TransactionDto;
 import com.teya.ledger.lib.api.type.TransactionType;
 import com.teya.ledger.lib.model.utils.MathUtils;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +32,19 @@ public class LedgerServiceImpl implements LedgerService {
     private final BalanceRepository balanceRepository;
     private final TransactionRepository transactionRepository;
 
+
+    @Transactional
+    @Override
+    public BalanceDto registerAccount(@NonNull String accountId) {
+        Optional<Balance> balance = balanceRepository.findById(accountId);
+        if (balance.isEmpty()) {
+            Balance newBalance = new Balance();
+            return LedgerDtoUtils.toBalanceDto(balanceRepository.save(newBalance));
+        } else {
+            return LedgerDtoUtils.toBalanceDto(balance.get());
+        }
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<Transaction> getTransactionHistory() {
@@ -36,10 +52,10 @@ public class LedgerServiceImpl implements LedgerService {
     }
 
     @Override
-    public long getBalance() {
+    public BalanceDto getBalance() {
         return balanceRepository.findById(GLOBAL_ACCOUNT_ID)
-                .map(Balance::getBalance)
-                .orElse(0L);
+                .map(LedgerDtoUtils::toBalanceDto)
+                .orElse(null);
     }
 
     // Transactional - to ensure Immutability
