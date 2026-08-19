@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
-public class LedgerControllerAdvisor {
+public final class LedgerControllerAdvisor {
 
     /**
      * 1. Обработка ошибок валидации DTO (@Valid @RequestBody)

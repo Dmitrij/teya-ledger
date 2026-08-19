@@ -1,8 +1,5 @@
 package com.teya.ledger.app.rest;
 
-import com.google.gson.Gson;
-import com.teya.ledger.app.config.GsonConfig;
-import com.teya.ledger.app.config.GsonWebMvcConfig;
 import com.teya.ledger.app.db.model.Transaction;
 import com.teya.ledger.app.exception.AccountNotFoundException;
 import com.teya.ledger.app.rest.advisor.LedgerControllerAdvisor;
@@ -13,9 +10,7 @@ import com.teya.ledger.lib.api.type.TransactionType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,20 +26,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(
-        controllers = {LedgerRestController.class, LedgerControllerAdvisor.class},
-        excludeAutoConfiguration = {
-                HibernateJpaAutoConfiguration.class
-        }
-)
-@Import({GsonConfig.class, GsonWebMvcConfig.class})
+@WebMvcTest(controllers = {LedgerRestController.class, LedgerControllerAdvisor.class})
 public class LedgerRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private Gson gson;
 
     @MockitoBean
     private LedgerService ledgerService; // Изолируем слой бизнес-логики
@@ -110,10 +96,13 @@ public class LedgerRestControllerTest {
         // Arrange: Создаем некорректный DTO, нарушающий аннотацию @Positive
         TransactionDto invalidDto = new TransactionDto(TransactionType.DEPOSIT, -500L);
 
+        // Создаем мапер вручную, не требуя его от контекста Spring
+        com.fasterxml.jackson.databind.ObjectMapper manualMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
         // Act & Assert
         mockMvc.perform(post(API_PREFIX + MOVEMENT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(invalidDto))) // Сериализуем через Gson
+                        .content(manualMapper.writeValueAsString(invalidDto))) // Сериализуем через Gson
                 .andExpect(status().isBadRequest()) // Проверяем HTTP 400
 
                 // Проверяем структуру вашего ApiErrorDto
@@ -133,10 +122,13 @@ public class LedgerRestControllerTest {
         // Arrange: Создаем DTO, у которого сумма (amount) равна null, что нарушает аннотацию @NotNull
         TransactionDto invalidDto = new TransactionDto(TransactionType.DEPOSIT, null);
 
+        // Создаем мапер вручную, не требуя его от контекста Spring
+        com.fasterxml.jackson.databind.ObjectMapper manualMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        
         // Act & Assert
         mockMvc.perform(post(API_PREFIX + MOVEMENT_PATH)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(gson.toJson(invalidDto))) // Сериализуем через Gson
+                        .content(manualMapper.writeValueAsString(invalidDto))) // Сериализуем через Gson
                 .andExpect(status().isBadRequest()) // Ожидаем статус 400 Bad Request
 
                 // Проверяем структуру вашего ApiErrorDto
@@ -150,5 +142,5 @@ public class LedgerRestControllerTest {
         // Гарантируем, что из-за провала валидации Spring MVC, запрос не дошел до бизнес-логики сервиса
         Mockito.verifyNoInteractions(ledgerService);
     }
-    
+
 }
