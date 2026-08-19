@@ -19,7 +19,7 @@ public interface LedgerService {
     /**
      * QUERY SIDE: View the current balance
      */
-    BalanceDto getBalance();
+    BalanceDto getBalance(@NonNull String accountId);
 
     /**
      * COMMAND SIDE: processing balance change - record

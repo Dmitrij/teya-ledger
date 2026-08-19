@@ -23,4 +23,5 @@ public final class BalanceDto {
         this.balance = balance;
     }
 
+
 }

@@ -52,8 +52,8 @@ public class LedgerServiceImpl implements LedgerService {
     }
 
     @Override
-    public BalanceDto getBalance() {
-        return balanceRepository.findById(GLOBAL_ACCOUNT_ID)
+    public BalanceDto getBalance(@NonNull String accountId) {
+        return balanceRepository.findById(accountId)
                 .map(LedgerDtoUtils::toBalanceDto)
                 .orElse(null);
     }

@@ -31,15 +31,17 @@ public class LedgerRestControllerTest {
     private LedgerService ledgerService; // Изолируем слой бизнес-логики
 
     @Test
-    void testGetBalance_ShouldReturnBalanceMap() throws Exception {
+    void testGetBalance_ShouldReturnBalance_WithPathVariable() throws Exception {
         // Arrange
-        Mockito.when(ledgerService.getBalance()).thenReturn(new BalanceDto("XXX", 5000L));
+        String accountId = "12345";
+        BalanceDto expectedDto = new BalanceDto(accountId, 5000L);
+        Mockito.when(ledgerService.getBalance(accountId)).thenReturn(expectedDto);
 
         // Act & Assert
-        mockMvc.perform(get(API_PREFIX + BALANCE_PATH)
+        mockMvc.perform(get(API_PREFIX + BALANCE_PATH + "/" + accountId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.balance").value(5000L));
+                .andExpect(jsonPath("$.balance").value(expectedDto.getBalance()));
     }
 
     @Test
