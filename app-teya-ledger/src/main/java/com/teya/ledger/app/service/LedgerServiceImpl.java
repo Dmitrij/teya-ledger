@@ -4,6 +4,7 @@ import com.teya.ledger.app.db.model.Balance;
 import com.teya.ledger.app.db.model.Transaction;
 import com.teya.ledger.app.db.repository.BalanceRepository;
 import com.teya.ledger.app.db.repository.TransactionRepository;
+import com.teya.ledger.app.exception.AccountNotFoundException;
 import com.teya.ledger.app.utils.LedgerDtoUtils;
 import com.teya.ledger.lib.api.dto.BalanceDto;
 import com.teya.ledger.lib.api.dto.TransactionDto;
@@ -39,8 +40,10 @@ public class LedgerServiceImpl implements LedgerService {
         Optional<Balance> balance = balanceRepository.findById(accountId);
         if (balance.isEmpty()) {
             Balance newBalance = new Balance();
+            newBalance.setAccountId(accountId);
             return LedgerDtoUtils.toBalanceDto(balanceRepository.save(newBalance));
         } else {
+            // Идемпотентный сценарий: возвращаем существующий
             return LedgerDtoUtils.toBalanceDto(balance.get());
         }
     }
@@ -55,7 +58,8 @@ public class LedgerServiceImpl implements LedgerService {
     public BalanceDto getBalance(@NonNull String accountId) {
         return balanceRepository.findById(accountId)
                 .map(LedgerDtoUtils::toBalanceDto)
-                .orElse(null);
+                .orElseThrow(() -> new AccountNotFoundException(
+                        String.format("Account with ID '%s' not found", accountId)));
     }
 
     // Transactional - to ensure Immutability

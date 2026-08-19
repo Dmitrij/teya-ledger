@@ -1,6 +1,7 @@
 package com.teya.ledger.app.rest;
 
 import com.teya.ledger.app.db.model.Transaction;
+import com.teya.ledger.app.exception.AccountNotFoundException;
 import com.teya.ledger.app.service.LedgerService;
 import com.teya.ledger.lib.api.dto.BalanceDto;
 import com.teya.ledger.lib.api.type.TransactionType;
@@ -42,6 +43,31 @@ public class LedgerRestControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.balance").value(expectedDto.getBalance()));
+    }
+
+    @Test
+    void testGetBalance_ShouldReturn404AndApiErrorDto_WhenAccountNotFound() throws Exception {
+        // Arrange
+        String nonExistentAccountId = "missing-account-123";
+        String expectedExceptionMessage = String.format("Account with ID '%s' not found", nonExistentAccountId);
+
+        // Настраиваем Mock-сервис на выброс исключения
+        Mockito.when(ledgerService.getBalance(nonExistentAccountId))
+                .thenThrow(new AccountNotFoundException(expectedExceptionMessage));
+
+        // Act & Assert
+        mockMvc.perform(get(API_PREFIX + BALANCE_PATH + "/" + nonExistentAccountId)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound()) // Ожидаем HTTP 404
+
+                // Проверяем структуру вашего ApiErrorDto
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value(expectedExceptionMessage))
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors").value(org.hamcrest.Matchers.nullValue())); // Поля errors быть не должно (null)
+
+        // Проверяем, что метод сервиса действительно вызывался с нужным ID
+        Mockito.verify(ledgerService, Mockito.times(1)).getBalance(nonExistentAccountId);
     }
 
     @Test

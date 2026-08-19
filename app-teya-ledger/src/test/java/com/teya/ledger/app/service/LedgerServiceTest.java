@@ -4,6 +4,7 @@ import com.teya.ledger.app.TeyaLedgerApplication;
 import com.teya.ledger.app.db.model.Transaction;
 import com.teya.ledger.app.db.repository.BalanceRepository;
 import com.teya.ledger.app.db.repository.TransactionRepository;
+import com.teya.ledger.app.exception.AccountNotFoundException;
 import com.teya.ledger.lib.api.dto.BalanceDto;
 import com.teya.ledger.lib.api.dto.TransactionDto;
 import com.teya.ledger.lib.api.type.TransactionType;
@@ -65,6 +66,46 @@ public class LedgerServiceTest {
 
         // Assert
         assertEquals(0L, currentBalance, "Initial balance should be equals 0");
+    }
+
+    /**
+     * ТЕСТ: После регистрации аккаунт должен успешно находиться в базе данных
+     */
+    @Test
+    void testRegisterAccountAndGetBalance_ShouldWorkPerfectly() {
+        // Arrange
+        String newAccountId = "client-777";
+
+        // Act: Регистрируем новый аккаунт
+        BalanceDto registeredAccount = ledgerService.registerAccount(newAccountId);
+
+        // Assert: Проверяем возвращаемый DTO после регистрации
+        assertNotNull(registeredAccount);
+        assertEquals(newAccountId, registeredAccount.getAccountId());
+        assertEquals(0L, registeredAccount.getBalance(), "Начальный баланс нового аккаунта должен быть равен 0");
+
+        // Act: Проверяем, что теперь getBalance() находит этот аккаунт без ошибок
+        BalanceDto fetchedAccount = ledgerService.getBalance(newAccountId);
+
+        // Assert
+        assertNotNull(fetchedAccount);
+        assertEquals(newAccountId, fetchedAccount.getAccountId());
+        assertEquals(0L, fetchedAccount.getBalance());
+    }
+
+    @Test
+    void testGetBalance_ShouldThrowAccountNotFoundException_WhenAccountDoesNotExist() {
+        // Arrange
+        String nonExistentAccountId = "unknown-account-id";
+
+        // Act & Assert
+        AccountNotFoundException exception = assertThrows(AccountNotFoundException.class, () -> {
+            ledgerService.getBalance(nonExistentAccountId);
+        }, "Метод getBalance должен выбросить AccountNotFoundException для несуществующего ID");
+
+        // Проверяем, что текст сообщения внутри исключения сформирован корректно
+        assertTrue(exception.getMessage().contains(nonExistentAccountId),
+                "Сообщение об ошибке должно содержать ID отсутствующего аккаунта");
     }
 
     @Test
