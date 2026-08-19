@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.teya.ledger.lib.api.TeyaLedgerApi.API_PREFIX;
 import static com.teya.ledger.lib.api.TeyaLedgerApi.BALANCE_PATH;
@@ -47,18 +46,11 @@ public final class LedgerRestController {
     }
 
     @PostMapping(MOVEMENT_PATH)
-    public ResponseEntity<?> createMovement(@Valid @RequestBody TransactionDto transactionDto) {
+    public ResponseEntity<Transaction> createMovement(@Valid @RequestBody TransactionDto transactionDto) {
         log.info("Creating transaction {}", transactionDto);
-        try {
-            Transaction event = ledgerService.recordMovement(transactionDto);
-            return new ResponseEntity<>(event, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid transaction type or layout"));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Malformed request metadata"));
-        }
+        // Вся магия обработки ошибок теперь происходит автоматически на уровне Spring Context
+        Transaction event = ledgerService.recordMovement(transactionDto);
+        return new ResponseEntity<>(event, HttpStatus.CREATED);
     }
 
 }
